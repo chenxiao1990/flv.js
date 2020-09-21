@@ -83,7 +83,9 @@ class FetchStreamLoader extends BaseLoader {
                 }
             }
         }
-
+         // 创建 AbortController 的实例
+        this.abcon = new AbortController()
+        const signal1 = this.abcon.signal
         let params = {
             method: 'GET',
             headers: headers,
@@ -91,7 +93,8 @@ class FetchStreamLoader extends BaseLoader {
             cache: 'default',
             // The default policy of Fetch API in the whatwg standard
             // Safari incorrectly indicates 'no-referrer' as default policy, fuck it
-            referrerPolicy: 'no-referrer-when-downgrade'
+            referrerPolicy: 'no-referrer-when-downgrade',
+            signal: signal1
         };
 
         // add additional headers
@@ -163,6 +166,9 @@ class FetchStreamLoader extends BaseLoader {
 
     abort() {
         this._requestAbort = true;
+        if (this.abcon != null) {
+            this.abcon.abort();
+        }
     }
 
     _pump(reader) {  // ReadableStreamReader
